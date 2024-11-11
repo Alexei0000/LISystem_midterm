@@ -3,10 +3,11 @@
 ## Description
 This project is a web application that allows users to query a certain databse with boardgame metadata.
 ## Installation
-1. Installation:
+1. In the LISystem_DB directory, run: 
 ```bash
 npm install
 ```
+for installation
 2. DataBase Installation:
 
 --Download PostgreSQL
