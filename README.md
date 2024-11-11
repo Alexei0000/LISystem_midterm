@@ -7,14 +7,13 @@ This project is a web application that allows users to query a certain databse w
 ```bash
 npm install
 ```
-for installation
 2. DataBase Installation:
 
 --Download PostgreSQL
 
---Input correct User_name, Password and Database_name in /db/db.js (pls ingore my password) 
+--Input correct username, password and Database_name in /db/db.js (pls ingore my password) 
 
---Inport data from the sample data folder in to your databse
+--Inport data from the sample data folder into your databse
 
 
 3. In the LISystem_DB directory, run: 
