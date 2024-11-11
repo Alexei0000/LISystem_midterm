@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Interface</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 2rem;
+        }
+        .input-section {
+            margin-bottom: 1rem;
+        }
+        .result-item {
+            border: 1px solid #ddd; /* Adds a light border to create the box effect */
+            border-radius: 5px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background-color: #f9f9f9; /* Light background for each box */
+        }
+
+        .result-item div {
+            display: flex;
+            align-items: flex-start; /* Keeps label and value at the top */
+            margin-bottom: 0.5rem;
+        }
+
+        .result-item div div:first-child {
+            width: 150px;
+            font-weight: bold;
+            padding-right: 10px;
+        }
+
+        .result-item div div:last-child {
+            flex: 1; /* Allows the description to expand as needed */
+        }
+    </style>
+</head>
+<body>
+<h1>Search Database</h1>
+<div class="input-section">
+    <label for="attribute">Choose an attribute:</label>
+    <select id="attribute" onchange="toggleInputType()">
+        <option value="name">name</option>
+        <option value="suitable_age">suitable_age</option>
+        <option value="language">language</option>
+        <option value="theme_scenario">theme_scenario</option>
+        <option value="player_number">player_number</option>
+        <option value="playtime">playtime</option>
+    </select>
+</div>
+<div class="input-section" id="input-container">
+    <label for="searchTerm">Enter search term:</label>
+    <input type="text" id="searchTerm" placeholder="Enter search term" />
+</div>
+<button onclick="searchDatabase()">Search</button>
+
+<div id="results"></div>
+
+<script>
+    const dropdownOptions = {
+        suitable_age: ['0～5', '6～10', '11～15', '16～20'],
+        theme_scenario: ['Abstract', 'Children', 'Family', 'Party'],
+        language: ['中文', '德文'],
+        playtime: ['10～20', '20～30', '30～40', '40～50', '50～60'],
+        player_number: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
+    };
+
+    function toggleInputType() {
+        const attribute = document.getElementById('attribute').value;
+        const inputContainer = document.getElementById('input-container');
+        inputContainer.innerHTML = '<label for="searchTerm">Enter search term:</label>';
+
+        if (dropdownOptions[attribute]) {
+            const select = document.createElement('select');
+            select.id = 'searchTerm';
+            dropdownOptions[attribute].forEach(option => {
+                const opt = document.createElement('option');
+                opt.value = option;
+                opt.textContent = option;
+                select.appendChild(opt);
+            });
+            inputContainer.appendChild(select);
+        } else {
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.id = 'searchTerm';
+            input.placeholder = 'Enter search term';
+            inputContainer.appendChild(input);
+        }
+    }
+
+    async function searchDatabase() {
+        const attribute = document.getElementById('attribute').value;
+        const searchTerm = document.getElementById('searchTerm').value;
+
+        if (!searchTerm) {
+            alert('Please enter a search term');
+            return;
+        }
+
+        try {
+            const response = await fetch(`http://localhost:3000/search?attribute=${encodeURIComponent(attribute)}&value=${encodeURIComponent(searchTerm)}`);
+            if (!response.ok) throw new Error('Network response was not ok');
+
+            const data = await response.json();
+            displayResults(data);
+        } catch (error) {
+            console.error('Error:', error);
+            document.getElementById('results').innerText = 'An error occurred while fetching data.';
+        }
+    }
+
+    function displayResults(data) {
+        const resultsContainer = document.getElementById('results');
+        resultsContainer.innerHTML = ''; // Clear previous results
+
+        if (data.length === 0) {
+            resultsContainer.innerText = 'No results found.';
+            return;
+        }
+
+        data.forEach((item) => {
+            const resultDiv = document.createElement('div');
+            resultDiv.classList.add('result-item');
+
+            const attributes = [
+                { label: 'Name', value: item.name || 'N/A' },
+                { label: 'Age Suitable', value: item.age || 'N/A' },
+                { label: 'Description', value: item.description || 'N/A' },
+                { label: 'Language', value: item.language || 'N/A' },
+                { label: 'Policy', value: item.policy || 'N/A' },
+                { label: 'Location', value: item.location || 'N/A' },
+            ];
+
+            attributes.forEach(attr => {
+                const rowDiv = document.createElement('div');
+
+                const labelDiv = document.createElement('div');
+                labelDiv.textContent = attr.label + ':';
+                labelDiv.style.marginRight = '30px';
+
+                const valueDiv = document.createElement('div');
+                const textValue = String(attr.value);
+
+                valueDiv.innerHTML = textValue.replace(/\n/g, '<br>');
+
+                rowDiv.appendChild(labelDiv);
+                rowDiv.appendChild(valueDiv);
+                resultDiv.appendChild(rowDiv);
+            });
+
+            resultsContainer.appendChild(resultDiv);
+        });
+    }
+</script>
+</body>
+</html>
