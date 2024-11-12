@@ -20,6 +20,5 @@ npm install
 ```bash
 node server.js
 ```
-
-Runs the app in the development mode at http://localhost:3000
+4. Open index.html in browser to start using
 
